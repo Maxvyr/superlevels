@@ -29,15 +29,9 @@
       font-family: 'YouTube Sans', 'Roboto', sans-serif;
       font-weight: 500;
     }
-    /* Sidebar suggestions on video pages */
-    #secondary.ytd-watch-flexy,
-    ytd-watch-next-secondary-results-renderer,
-    #related {
+    /* Native YouTube sidebar suggestions on video pages */
+    ytd-watch-next-secondary-results-renderer yt-lockup-view-model {
       display: none !important;
-    }
-    /* Make video player wider without sidebar */
-    ytd-watch-flexy[flexy][is-two-columns_] #primary.ytd-watch-flexy {
-      max-width: 100% !important;
     }
     /* End screen suggestions & cards */
     .ytp-ce-element,
