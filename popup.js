@@ -2,15 +2,16 @@
 //  Navigation
 // ═══════════════════════════════════
 function switchToPage(page) {
+  if (!document.querySelector(`.nav button[data-page="${page}"]`)) {
+    page = "tabcleaner";
+  }
   document.querySelectorAll(".nav button").forEach((b) => b.classList.remove("active"));
   document.querySelectorAll(".page").forEach((p) => p.classList.remove("active"));
   const btn = document.querySelector(`.nav button[data-page="${page}"]`);
-  if (!btn) return;
   btn.classList.add("active");
   document.getElementById("page-" + page).classList.add("active");
   if (page === "cookies") loadCookies();
   if (page === "redirects") loadRedirects();
-  if (page === "darkmode") loadDarkMode();
   if (page === "xdim") loadXDim();
   if (page === "jstoggle") loadJsToggle();
   if (page === "nocookie") loadNoCookie();
@@ -18,7 +19,6 @@ function switchToPage(page) {
   if (page === "unhook") loadUnhook();
   if (page === "xunhook") loadXUnhook();
   if (page === "jsonformat") loadJsonFormat();
-  if (page === "music") { loadMusicHistory(); loadAcrFields(); }
   chrome.storage.local.set({ last_tab: page });
 }
 
@@ -440,90 +440,6 @@ document.getElementById("btnRedirectCopy").addEventListener("click", async () =>
 });
 
 // ═══════════════════════════════════
-//  Dark Mode
-// ═══════════════════════════════════
-const darkToggle = document.getElementById("darkToggle");
-const darkStatus = document.getElementById("darkStatus");
-const darkHostEl = document.getElementById("darkHost");
-const darkBrightness = document.getElementById("darkBrightness");
-const darkBrightnessVal = document.getElementById("darkBrightnessVal");
-const scopeSite = document.getElementById("scopeSite");
-const scopeGlobal = document.getElementById("scopeGlobal");
-
-let darkHost = "";
-let darkScope = "site"; // "site" or "global"
-
-async function loadDarkMode() {
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  if (!tab || !tab.url) return;
-
-  try { darkHost = new URL(tab.url).hostname; } catch { darkHost = ""; }
-  darkHostEl.textContent = darkHost ? `Current site: ${darkHost}` : "";
-
-  const siteKey = "darkmode_" + darkHost;
-  const data = await chrome.storage.local.get([siteKey, "darkmode_global", "darkmode_brightness"]);
-
-  const brightness = data.darkmode_brightness || 100;
-  darkBrightness.value = brightness;
-  darkBrightnessVal.textContent = brightness + "%";
-
-  const siteState = data[siteKey];
-  const globalState = data.darkmode_global || false;
-  const enabled = siteState !== undefined ? siteState : globalState;
-
-  darkToggle.checked = enabled;
-  updateDarkStatus(enabled);
-}
-
-function updateDarkStatus(on) {
-  darkStatus.textContent = on ? "ON" : "OFF";
-  darkStatus.className = "status " + (on ? "on" : "off");
-}
-
-async function applyDark() {
-  const enabled = darkToggle.checked;
-  const brightness = parseInt(darkBrightness.value);
-  updateDarkStatus(enabled);
-
-  // Save preference
-  if (darkScope === "global") {
-    await chrome.storage.local.set({ darkmode_global: enabled });
-  } else {
-    const siteKey = "darkmode_" + darkHost;
-    await chrome.storage.local.set({ [siteKey]: enabled });
-  }
-  await chrome.storage.local.set({ darkmode_brightness: brightness });
-
-  // Send to active tab's content script
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  if (tab) {
-    chrome.tabs.sendMessage(tab.id, {
-      type: "darkmode_toggle",
-      enabled,
-      brightness,
-    }).catch(() => {});
-  }
-}
-
-darkToggle.addEventListener("change", applyDark);
-
-darkBrightness.addEventListener("input", () => {
-  darkBrightnessVal.textContent = darkBrightness.value + "%";
-});
-darkBrightness.addEventListener("change", applyDark);
-
-scopeSite.addEventListener("click", () => {
-  darkScope = "site";
-  scopeSite.classList.add("active");
-  scopeGlobal.classList.remove("active");
-});
-scopeGlobal.addEventListener("click", () => {
-  darkScope = "global";
-  scopeGlobal.classList.add("active");
-  scopeSite.classList.remove("active");
-});
-
-// ═══════════════════════════════════
 //  X Dim Mode
 // ═══════════════════════════════════
 const xdimToggle = document.getElementById("xdimToggle");
@@ -820,238 +736,6 @@ jsToggle.addEventListener("change", async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (tab) chrome.tabs.reload(tab.id);
 });
-
-// ═══════════════════════════════════
-//  Music Recognizer (ACRCloud)
-// ═══════════════════════════════════
-// ACRCloud credentials — loaded from storage so they're not hardcoded in source
-let ACR_HOST = "";
-let ACR_KEY = "";
-let ACR_SECRET = "";
-
-// Load saved creds (set defaults on first run)
-chrome.storage.local.get(["acr_host", "acr_key", "acr_secret"], (data) => {
-  ACR_HOST = data.acr_host || "identify-eu-west-1.acrcloud.com";
-  ACR_KEY = data.acr_key || "";
-  ACR_SECRET = data.acr_secret || "";
-});
-
-const listenBtn = document.getElementById("listenBtn");
-const listenTimer = document.getElementById("listenTimer");
-const listenLabel = document.getElementById("listenLabel");
-const musicResult = document.getElementById("musicResult");
-const musicHistoryEl = document.getElementById("musicHistory");
-let isRecording = false;
-
-listenBtn.addEventListener("click", () => {
-  if (isRecording) return;
-  startListening();
-});
-
-async function startListening() {
-  if (!ACR_KEY || !ACR_SECRET) {
-    musicResult.innerHTML = `<div class="music-error">ACRCloud credentials not set. <a href="https://www.acrcloud.com/sign-up/" target="_blank" style="color:#6a9fd8;">Sign up free</a> and add them below.</div>`;
-    showAcrConfig();
-    return;
-  }
-  isRecording = true;
-  listenBtn.classList.add("recording");
-  listenBtn.closest(".music-center").classList.add("active");
-  listenLabel.textContent = "Listening...";
-  musicResult.innerHTML = "";
-
-  let seconds = 10;
-  listenTimer.textContent = seconds + "s";
-  const interval = setInterval(() => {
-    seconds--;
-    listenTimer.textContent = seconds + "s";
-    if (seconds <= 0) clearInterval(interval);
-  }, 1000);
-
-  try {
-    const stream = await new Promise((resolve, reject) => {
-      chrome.tabCapture.capture({ audio: true, video: false }, (s) => {
-        if (chrome.runtime.lastError) return reject(new Error(chrome.runtime.lastError.message));
-        if (!s) return reject(new Error("No audio stream"));
-        resolve(s);
-      });
-    });
-
-    // Pipe audio back to speakers so user still hears it
-    const audioCtx = new AudioContext();
-    const source = audioCtx.createMediaStreamSource(stream);
-    source.connect(audioCtx.destination);
-
-    // Record 5 seconds
-    const recorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
-    const chunks = [];
-    recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
-
-    const blob = await new Promise((resolve) => {
-      recorder.onstop = () => {
-        source.disconnect();
-        audioCtx.close();
-        stream.getTracks().forEach((t) => t.stop());
-        resolve(new Blob(chunks, { type: "audio/webm" }));
-      };
-      recorder.start();
-      setTimeout(() => recorder.stop(), 10000);
-    });
-
-    clearInterval(interval);
-    listenTimer.textContent = "";
-    listenLabel.textContent = "Identifying...";
-
-    const result = await identifyWithACR(blob);
-    showResult(result);
-  } catch (err) {
-    clearInterval(interval);
-    musicResult.innerHTML = `<div class="music-error">${esc(err.message)}</div>`;
-    showAcrConfig();
-  } finally {
-    isRecording = false;
-    listenBtn.classList.remove("recording");
-    listenBtn.closest(".music-center").classList.remove("active");
-    listenTimer.textContent = "";
-    listenLabel.textContent = "Tap to listen";
-  }
-}
-
-async function hmacSha1(key, message) {
-  const enc = new TextEncoder();
-  const cryptoKey = await crypto.subtle.importKey(
-    "raw", enc.encode(key), { name: "HMAC", hash: "SHA-1" }, false, ["sign"]
-  );
-  const sig = await crypto.subtle.sign("HMAC", cryptoKey, enc.encode(message));
-  return btoa(String.fromCharCode(...new Uint8Array(sig)));
-}
-
-async function identifyWithACR(audioBlob) {
-  const timestamp = Math.floor(Date.now() / 1000);
-  const stringToSign = `POST\n/v1/identify\n${ACR_KEY}\naudio\n1\n${timestamp}`;
-  const signature = await hmacSha1(ACR_SECRET, stringToSign);
-
-  const arrayBuf = await audioBlob.arrayBuffer();
-  const form = new FormData();
-  form.append("access_key", ACR_KEY);
-  form.append("data_type", "audio");
-  form.append("signature_version", "1");
-  form.append("signature", signature);
-  form.append("timestamp", timestamp.toString());
-  form.append("sample_bytes", arrayBuf.byteLength.toString());
-  form.append("sample", audioBlob, "sample.webm");
-
-  const resp = await fetch(`https://${ACR_HOST}/v1/identify`, { method: "POST", body: form });
-  const data = await resp.json();
-
-  if (data.status && data.status.code === 0 && data.metadata) {
-    const music = data.metadata.music;
-    const humming = data.metadata.humming;
-    if (music && music.length > 0) return music[0];
-    if (humming && humming.length > 0) return humming[0];
-    throw new Error("Song recognized but no match found. Try a clearer part of the track.");
-  } else if (data.status && data.status.code === 0) {
-    throw new Error("No match found. Try during a clearer part of the song (e.g. chorus).");
-  } else if (data.status && data.status.code === 1001) {
-    throw new Error("No music detected. Make sure audio is playing in the tab.");
-  } else {
-    throw new Error(data.status ? data.status.msg : "Unknown error");
-  }
-}
-
-function showResult(song) {
-  const title = song.title || "Unknown";
-  const artist = (song.artists || []).map((a) => a.name).join(", ") || "Unknown";
-  const album = song.album ? song.album.name : "";
-
-  const ytQuery = encodeURIComponent(`${title} ${artist}`);
-  const ytUrl = `https://www.youtube.com/results?search_query=${ytQuery}`;
-
-  musicResult.innerHTML = `
-    <a class="song-card" href="${ytUrl}" target="_blank" style="text-decoration:none;color:inherit;cursor:pointer;">
-      <div class="art">🎵</div>
-      <div class="info">
-        <div class="title">${esc(title)}</div>
-        <div class="artist">${esc(artist)}</div>
-        ${album ? `<div class="album">${esc(album)}</div>` : ""}
-      </div>
-      <div style="color:#e94560;font-size:18px;flex-shrink:0;">▶</div>
-    </a>
-  `;
-
-  // Save to history
-  chrome.storage.local.get(["music_history"], (data) => {
-    const history = data.music_history || [];
-    history.unshift({ title, artist, album, time: Date.now() });
-    if (history.length > 20) history.length = 20;
-    chrome.storage.local.set({ music_history: history }, loadMusicHistory);
-  });
-}
-
-// ACR config save/load
-document.getElementById("acrSaveBtn").addEventListener("click", () => {
-  const host = document.getElementById("acrHost").value.trim();
-  const key = document.getElementById("acrKey").value.trim();
-  const secret = document.getElementById("acrSecret").value.trim();
-  ACR_HOST = host || ACR_HOST;
-  ACR_KEY = key;
-  ACR_SECRET = secret;
-  chrome.storage.local.set({ acr_host: ACR_HOST, acr_key: ACR_KEY, acr_secret: ACR_SECRET });
-  document.getElementById("acrSaveBtn").textContent = "Saved!";
-  setTimeout(() => { document.getElementById("acrSaveBtn").textContent = "Save"; }, 1500);
-});
-
-function showAcrConfig() {
-  document.getElementById("acrConfig").style.display = "";
-}
-
-document.getElementById("acrSettingsBtn").addEventListener("click", () => {
-  const cfg = document.getElementById("acrConfig");
-  if (cfg.style.display === "none") {
-    cfg.style.display = "";
-    // Load fields without the auto-hide logic
-    chrome.storage.local.get(["acr_host", "acr_key", "acr_secret"], (data) => {
-      document.getElementById("acrHost").value = data.acr_host || "identify-eu-west-1.acrcloud.com";
-      document.getElementById("acrKey").value = data.acr_key || "";
-      document.getElementById("acrSecret").value = data.acr_secret || "";
-    });
-  } else {
-    cfg.style.display = "none";
-  }
-});
-
-// Load ACR fields when music tab opens
-function loadAcrFields() {
-  chrome.storage.local.get(["acr_host", "acr_key", "acr_secret"], (data) => {
-    document.getElementById("acrHost").value = data.acr_host || "identify-eu-west-1.acrcloud.com";
-    document.getElementById("acrKey").value = data.acr_key || "";
-    document.getElementById("acrSecret").value = data.acr_secret || "";
-    // Only show config if creds are missing
-    if (!data.acr_key || !data.acr_secret) showAcrConfig();
-    else document.getElementById("acrConfig").style.display = "none";
-  });
-}
-
-function loadMusicHistory() {
-  chrome.storage.local.get(["music_history"], (data) => {
-    const history = data.music_history || [];
-    if (!history.length) {
-      musicHistoryEl.innerHTML = "";
-      return;
-    }
-    musicHistoryEl.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between"><h2>Recent</h2><button id="clearHistory" style="background:none;border:none;color:#e94560;font-size:11px;cursor:pointer;">Clear</button></div>` + history.map((h) => {
-      const q = encodeURIComponent(`${h.title} ${h.artist}`);
-      return `<a class="history-item" href="https://www.youtube.com/results?search_query=${q}" target="_blank" style="text-decoration:none;color:inherit;cursor:pointer;">
-        <span class="h-title">${esc(h.title)}</span>
-        <span class="h-artist">${esc(h.artist)}</span>
-        <span style="color:#e94560;font-size:12px;flex-shrink:0;">▶</span>
-      </a>`;
-    }).join("");
-    document.getElementById("clearHistory").addEventListener("click", () => {
-      chrome.storage.local.remove("music_history", loadMusicHistory);
-    });
-  });
-}
 
 // ═══════════════════════════════════
 //  Picture-in-Picture

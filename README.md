@@ -36,9 +36,6 @@ Full cookie manager for the current site. View, edit, add, and delete cookies. E
 ### 🔀 Redirect Tracer
 See every redirect hop your browser took to reach the current page. Shows status codes (301, 302, 307, etc.) with a visual chain. Copy the full redirect chain to clipboard.
 
-### 🌙 Dark Mode
-Instant dark mode for any website using CSS filter inversion. Adjustable brightness. Toggle per-site or globally. Images and videos are automatically re-inverted so they look normal.
-
 ### 𝕏 X Dim Mode
 Custom dim theme for X/Twitter with 7 color palettes: Dim, Slate, Jade, Plum, Dusk, Ember, or a custom hue. Live preview in the popup.
 
@@ -53,9 +50,6 @@ Write custom CSS for any website, applied in real-time as you type. Saved per-do
 
 ### 📺 YouTube Unhook
 Removes YouTube distractions: no homepage feed, no sidebar suggestions, no end screen overlays, no Shorts. Search still works — just no algorithmic recommendations.
-
-### 🎵 Music Recognizer
-Shazam-like music identification for any tab. Captures 10 seconds of audio and identifies the song via [ACRCloud](https://www.acrcloud.com/sign-up/) (free signup, bring your own API key). Results link to YouTube. History of recognized songs.
 
 ### 🖼 Picture-in-Picture
 Pop the largest video on the current tab into a floating PiP window with one click.
@@ -83,7 +77,6 @@ Auto-detects pure JSON response pages and formats them with syntax highlighting,
 
 - **No data collection.** Everything stays local in `chrome.storage.local`.
 - **No analytics, no tracking, no phone-home.**
-- The only external network request is the Music Recognizer, which sends a short audio clip to ACRCloud — and only when you explicitly click "Listen" and provide your own API keys.
 - All source code is right here. Read it, audit it, fork it.
 
 ## License

@@ -24,7 +24,7 @@
       flex-shrink: 0;
     }
     .nav button {
-      width: calc(100% / 7);
+      width: calc(100% / 6);
       padding: 9px 2px;
       background: none;
       border: none;
@@ -298,17 +298,6 @@
     .redirect-empty .big-icon { font-size: 36px; margin-bottom: 10px; }
     .redirect-empty p { font-size: 12px; }
 
-    /* ── Dark Mode ── */
-    .dark-big-toggle {
-      display: flex; flex-direction: column; align-items: center;
-      padding: 24px 0 20px; gap: 12px;
-    }
-    .dark-big-toggle .moon { font-size: 48px; line-height: 1; }
-    .dark-big-toggle .status {
-      font-size: 14px; font-weight: 600;
-    }
-    .dark-big-toggle .status.on { color: #e94560; }
-    .dark-big-toggle .status.off { color: #555; }
     .big-switch {
       position: relative; width: 56px; height: 30px;
     }
@@ -326,44 +315,6 @@
     }
     .big-switch input:checked + .big-slider { background: #e94560; }
     .big-switch input:checked + .big-slider::before { transform: translateX(26px); }
-    .dark-host {
-      text-align: center; font-size: 12px; color: #666;
-      margin-bottom: 16px;
-    }
-    .dark-section {
-      padding: 10px 12px; background: #16213e;
-      border-radius: 8px; margin-bottom: 10px;
-    }
-    .dark-section label {
-      display: block; font-size: 12px; color: #888;
-      margin-bottom: 6px;
-    }
-    .dark-section .range-row {
-      display: flex; align-items: center; gap: 10px;
-    }
-    .dark-section input[type="range"] {
-      flex: 1; accent-color: #e94560;
-      height: 4px;
-    }
-    .dark-section .range-val {
-      font-size: 12px; color: #aaa; min-width: 36px;
-      text-align: right;
-    }
-    .dark-scope {
-      display: flex; gap: 6px; margin-bottom: 10px;
-    }
-    .dark-scope button {
-      flex: 1; padding: 8px; border: 1px solid #2a2a4a;
-      background: #16213e; color: #888;
-      border-radius: 6px; font-size: 12px; font-weight: 600;
-      cursor: pointer; transition: all 0.15s;
-    }
-    .dark-scope button:focus { outline: none; }
-    .dark-scope button.active {
-      border-color: #e94560; color: #e94560;
-      background: #2a1525;
-    }
-
     /* ── X Dim Mode ── */
     .xdim-big-toggle {
       display: flex; flex-direction: column; align-items: center;
@@ -540,124 +491,6 @@
       padding: 8px; line-height: 1.5;
     }
 
-    /* ── Music Recognizer ── */
-    .music-center {
-      display: flex; flex-direction: column;
-      align-items: center; padding: 20px 0 16px; gap: 8px;
-      border-radius: 16px; margin: 0 0 10px;
-      transition: background 0.4s, padding 0.4s;
-    }
-    .music-center.active {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      padding: 30px 0 20px;
-    }
-    .listen-btn {
-      width: 100px; height: 100px; border-radius: 50%;
-      border: none; background: #fff;
-      cursor: pointer; display: flex; align-items: center;
-      justify-content: center; transition: all 0.3s;
-      position: relative; box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-    }
-    .listen-btn:hover { transform: scale(1.05); }
-    .listen-btn .mic-icon { display: block; }
-    .listen-btn .bars-icon { display: none; }
-    .listen-btn.recording .mic-icon { display: none; }
-    .listen-btn.recording .bars-icon { display: flex; }
-    .listen-btn.recording {
-      animation: pulse-ring 1.5s ease-out infinite;
-    }
-    /* Sound bars animation */
-    .sound-bars {
-      display: flex; align-items: center;
-      gap: 4px; height: 36px;
-    }
-    .sound-bars .bar {
-      width: 6px; border-radius: 3px;
-      background: #e94560;
-      animation: soundbar 1s ease-in-out infinite;
-    }
-    .sound-bars .bar:nth-child(1) { height: 24px; animation-delay: 0s; }
-    .sound-bars .bar:nth-child(2) { height: 36px; animation-delay: 0.15s; }
-    .sound-bars .bar:nth-child(3) { height: 28px; animation-delay: 0.3s; }
-    .sound-bars .bar:nth-child(4) { height: 36px; animation-delay: 0.45s; }
-    .sound-bars .bar:nth-child(5) { height: 20px; animation-delay: 0.6s; }
-    @keyframes soundbar {
-      0%, 100% { transform: scaleY(0.4); }
-      50% { transform: scaleY(1); }
-    }
-    @keyframes pulse-ring {
-      0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.4); }
-      70% { box-shadow: 0 0 0 16px rgba(255,255,255,0); }
-      100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
-    }
-    .listen-label {
-      font-size: 15px; font-weight: 600; color: #888;
-      margin-top: 4px; transition: color 0.3s;
-    }
-    .music-center.active .listen-label { color: #fff; }
-    .listen-timer {
-      font-size: 24px; font-weight: 700;
-      font-variant-numeric: tabular-nums;
-      color: #e94560; min-height: 32px;
-      transition: color 0.3s;
-    }
-    .music-center.active .listen-timer { color: #fff; }
-    .music-result {
-      margin-top: 8px; width: 100%;
-    }
-    .music-result .song-card {
-      background: #16213e; border-radius: 10px;
-      padding: 14px; display: flex; gap: 12px;
-      align-items: center;
-    }
-    .song-card .art {
-      width: 56px; height: 56px; border-radius: 8px;
-      background: #0f3460; display: flex;
-      align-items: center; justify-content: center;
-      font-size: 28px; flex-shrink: 0;
-      overflow: hidden;
-    }
-    .song-card .art img {
-      width: 100%; height: 100%; object-fit: cover;
-    }
-    .song-card .info { flex: 1; min-width: 0; }
-    .song-card .title {
-      font-size: 14px; font-weight: 600; color: #fff;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .song-card .artist {
-      font-size: 12px; color: #aaa; margin-top: 2px;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .song-card .album {
-      font-size: 11px; color: #666; margin-top: 2px;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .music-error {
-      text-align: center; padding: 12px;
-      background: #2a1525; border-radius: 8px;
-      font-size: 12px; color: #e94560;
-    }
-    .music-history {
-      margin-top: 14px;
-    }
-    .music-history h2 { margin-bottom: 6px; }
-    .history-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 8px 10px; background: #16213e;
-      border-radius: 6px; margin-bottom: 4px;
-    }
-    .history-item .h-title {
-      font-size: 12px; font-weight: 500; color: #ddd;
-      flex: 1; min-width: 0;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .history-item .h-artist {
-      font-size: 11px; color: #888;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      max-width: 100px;
-    }
-
     /* ── Picture-in-Picture ── */
     .pip-center {
       display: flex; flex-direction: column; align-items: center;
@@ -734,14 +567,12 @@
     <button class="active" data-page="tabcleaner">🚮 Tabs</button>
     <button data-page="cookies">🍪 Cookies</button>
     <button data-page="redirects">🔀 Redirects</button>
-    <button data-page="darkmode">🌙 Dark</button>
     <button data-page="xdim">𝕏 Dim</button>
     <button data-page="xunhook">𝕏 Unhook</button>
     <button data-page="jstoggle">⚡ JS</button>
     <button data-page="nocookie">🚫 GDPR</button>
     <button data-page="livecss">🎨 CSS</button>
     <button data-page="unhook">📺 YT Unhook</button>
-    <button data-page="music">🎵 Music</button>
     <button data-page="pip">🖼 PiP</button>
     <button data-page="jsonformat">{} JSON</button>
   </div>
@@ -817,34 +648,6 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
         <span>Copy</span>
       </button>
-    </div>
-  </div>
-
-  <!-- ═══ Dark Mode Page ═══ -->
-  <div class="page" id="page-darkmode">
-    <div class="page-body">
-      <div class="dark-big-toggle">
-        <div class="moon">🌙</div>
-        <label class="big-switch">
-          <input type="checkbox" id="darkToggle">
-          <span class="big-slider"></span>
-        </label>
-        <div class="status off" id="darkStatus">OFF</div>
-      </div>
-      <div class="dark-host" id="darkHost"></div>
-
-      <div class="dark-scope">
-        <button id="scopeSite" class="active">This site only</button>
-        <button id="scopeGlobal">All sites</button>
-      </div>
-
-      <div class="dark-section">
-        <label>Brightness</label>
-        <div class="range-row">
-          <input type="range" id="darkBrightness" min="60" max="120" value="100">
-          <span class="range-val" id="darkBrightnessVal">100%</span>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -1007,48 +810,6 @@
       <div class="js-note">
         Disable JavaScript for the current site.<br>
         The page will reload when toggled.
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══ Music Recognizer Page ═══ -->
-  <div class="page" id="page-music">
-    <div class="page-body">
-      <div class="music-center">
-        <button class="listen-btn" id="listenBtn">
-          <span class="mic-icon">
-            <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#e94560" stroke-width="2" stroke-linecap="round">
-              <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/>
-              <path d="M19 10v2a7 7 0 01-14 0v-2"/>
-              <line x1="12" y1="19" x2="12" y2="23"/>
-              <line x1="8" y1="23" x2="16" y2="23"/>
-            </svg>
-          </span>
-          <span class="bars-icon">
-            <div class="sound-bars">
-              <div class="bar"></div>
-              <div class="bar"></div>
-              <div class="bar"></div>
-              <div class="bar"></div>
-              <div class="bar"></div>
-            </div>
-          </span>
-        </button>
-        <div class="listen-timer" id="listenTimer"></div>
-        <div class="listen-label" id="listenLabel">Tap to listen</div>
-        <button id="acrSettingsBtn" style="background:none;border:none;color:#555;font-size:16px;cursor:pointer;margin-top:4px;" title="API Settings">⚙️</button>
-      </div>
-      <div class="music-result" id="musicResult"></div>
-      <div class="music-history" id="musicHistory"></div>
-      <div class="dark-section" id="acrConfig" style="margin-top:14px;display:none">
-        <a href="https://www.acrcloud.com/sign-up/" target="_blank" style="display:block;text-align:center;padding:8px;margin-bottom:10px;background:#2a1525;border:1px solid #e94560;border-radius:6px;color:#e94560;font-size:12px;font-weight:600;text-decoration:none;">Sign up for free ACRCloud API keys →</a>
-        <label>ACRCloud Host</label>
-        <input type="text" id="acrHost" placeholder="identify-eu-west-1.acrcloud.com" style="width:100%;padding:6px 8px;background:#0f1e3d;border:1px solid #2a2a4a;border-radius:4px;color:#ddd;font-size:12px;margin-bottom:6px;">
-        <label>Access Key</label>
-        <input type="text" id="acrKey" placeholder="your access key" style="width:100%;padding:6px 8px;background:#0f1e3d;border:1px solid #2a2a4a;border-radius:4px;color:#ddd;font-size:12px;margin-bottom:6px;">
-        <label>Access Secret</label>
-        <input type="password" id="acrSecret" placeholder="your access secret" style="width:100%;padding:6px 8px;background:#0f1e3d;border:1px solid #2a2a4a;border-radius:4px;color:#ddd;font-size:12px;margin-bottom:6px;">
-        <button class="btn-save" id="acrSaveBtn" style="margin-top:4px;padding:6px 14px;font-size:12px;">Save</button>
       </div>
     </div>
   </div>
