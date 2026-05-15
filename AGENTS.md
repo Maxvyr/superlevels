@@ -13,7 +13,7 @@ Core feature areas:
 - JavaScript per-site toggle
 - GDPR cookie consent dismissal
 - Live CSS editor
-- YouTube and X/Twitter distraction removal
+- YouTube dim mode and YouTube/X distraction removal
 - Picture-in-picture
 - Google Search Maps link restoration
 - Google Images "View Image" restoration
@@ -28,7 +28,7 @@ This repo is intentionally lightweight and has no build step.
 - `popup.html` contains the popup UI, styles, and page markup.
 - `popup.js` contains popup navigation, settings, feature controls, cookie editing, and messaging to content/background scripts.
 - `nocookie.js`, `livecss.js`, and `jsonformat.js` run on all pages.
-- `unhook.js` runs on YouTube.
+- `unhook.js` and `ytdim.js` run on YouTube.
 - `xdim.js` and `xunhook.js` run on X/Twitter.
 - `gmaps.js` and `viewimage.js` run on Google domains.
 - `icon*.png`, `demo.gif`, and `demo.mp4` are static assets.

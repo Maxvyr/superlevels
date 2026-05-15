@@ -13,6 +13,7 @@ function switchToPage(page) {
   if (page === "cookies") loadCookies();
   if (page === "redirects") loadRedirects();
   if (page === "xdim") loadXDim();
+  if (page === "ytdim") loadYTDim();
   if (page === "jstoggle") loadJsToggle();
   if (page === "nocookie") loadNoCookie();
   if (page === "livecss") loadLiveCSS();
@@ -448,7 +449,7 @@ const xdimPreview = document.getElementById("xdimPreview");
 const xdimHueSlider = document.getElementById("xdimHueSlider");
 const xdimHueVal = document.getElementById("xdimHueVal");
 const xdimCustomHueSection = document.getElementById("xdimCustomHueSection");
-const xdimDots = document.querySelectorAll(".xdim-dot");
+const xdimDots = document.querySelectorAll("#page-xdim .xdim-dot");
 
 const XDIM_THEMES = {
   dim:   { hue: 210, sat: 34 },
@@ -535,6 +536,129 @@ xdimHueSlider.addEventListener("change", async () => {
   xdimCustomHue = parseInt(xdimHueSlider.value);
   await chrome.storage.local.set({ xdim_customHue: xdimCustomHue });
 });
+
+// ═══════════════════════════════════
+//  YouTube Dim Mode
+// ═══════════════════════════════════
+const ytdimToggle = document.getElementById("ytdimToggle");
+const ytdimStatus = document.getElementById("ytdimStatus");
+const ytdimPreview = document.getElementById("ytdimPreview");
+const ytdimHueSlider = document.getElementById("ytdimHueSlider");
+const ytdimHueVal = document.getElementById("ytdimHueVal");
+const ytdimCustomHueSection = document.getElementById("ytdimCustomHueSection");
+const ytdimDots = document.querySelectorAll("#page-ytdim .ytdim-dot");
+
+const YTDIM_THEMES = {
+  dim:   { hue: 210, sat: 34 },
+  slate: { hue: 210, sat: 8  },
+  jade:  { hue: 150, sat: 34 },
+  plum:  { hue: 270, sat: 34 },
+  dusk:  { hue: 330, sat: 34 },
+  ember: { hue: 25,  sat: 34 },
+};
+
+let ytdimTheme = "dim";
+let ytdimCustomHue = 210;
+
+async function loadYTDim() {
+  const data = await chrome.storage.local.get(["ytdim_enabled", "ytdim_theme", "ytdim_customHue"]);
+  const enabled = data.ytdim_enabled || false;
+  ytdimTheme = data.ytdim_theme || "dim";
+  ytdimCustomHue = data.ytdim_customHue || 210;
+
+  ytdimToggle.checked = enabled;
+  ytdimHueSlider.value = ytdimCustomHue;
+  ytdimHueVal.textContent = ytdimCustomHue + "°";
+
+  updateYTDimStatus(enabled);
+  updateYTDimThemeDots();
+  updateYTDimPreview();
+}
+
+function updateYTDimStatus(on) {
+  ytdimStatus.textContent = on ? "ON" : "OFF";
+  ytdimStatus.className = "status " + (on ? "on" : "off");
+}
+
+function updateYTDimThemeDots() {
+  ytdimDots.forEach((dot) => {
+    dot.classList.toggle("active", dot.dataset.theme === ytdimTheme);
+  });
+  ytdimCustomHueSection.classList.toggle("show", ytdimTheme === "custom");
+}
+
+function getYTDimHueSat() {
+  if (ytdimTheme === "custom") return { hue: ytdimCustomHue, sat: 34 };
+  return YTDIM_THEMES[ytdimTheme] || YTDIM_THEMES.dim;
+}
+
+function updateYTDimPreview() {
+  const { hue: h, sat: s } = getYTDimHueSat();
+  const bSat = Math.round(s * 0.47);
+  const bar = ytdimPreview.querySelector(".xdim-preview-bar");
+  const card = ytdimPreview.querySelector(".xdim-preview-tweet");
+  bar.style.background = `hsl(${h}, ${s}%, 15%)`;
+  bar.style.color = `hsl(${h}, ${Math.round(s * 0.32)}%, 62%)`;
+  card.style.background = `hsl(${h}, ${s}%, 12%)`;
+  card.style.color = `hsl(${h}, ${Math.round(s * 0.32)}%, 62%)`;
+  card.style.borderColor = `hsl(${h}, ${bSat}%, 26%)`;
+}
+
+ytdimToggle.addEventListener("change", async () => {
+  const enabled = ytdimToggle.checked;
+  updateYTDimStatus(enabled);
+  await chrome.storage.local.set({ ytdim_enabled: enabled });
+
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  if (tab) {
+    await ensureYTDimScript(tab);
+    chrome.tabs.sendMessage(tab.id, { type: "ytdim_toggle", enabled }).catch(() => {});
+  }
+});
+
+ytdimDots.forEach((dot) => {
+  dot.addEventListener("click", async () => {
+    ytdimTheme = dot.dataset.theme;
+    updateYTDimThemeDots();
+    updateYTDimPreview();
+    await chrome.storage.local.set({ ytdim_theme: ytdimTheme });
+    if (ytdimToggle.checked) {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (tab) await ensureYTDimScript(tab);
+    }
+  });
+});
+
+ytdimHueSlider.addEventListener("input", () => {
+  ytdimCustomHue = parseInt(ytdimHueSlider.value);
+  ytdimHueVal.textContent = ytdimCustomHue + "°";
+  updateYTDimPreview();
+});
+ytdimHueSlider.addEventListener("change", async () => {
+  ytdimCustomHue = parseInt(ytdimHueSlider.value);
+  await chrome.storage.local.set({ ytdim_customHue: ytdimCustomHue });
+  if (ytdimToggle.checked) {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tab) await ensureYTDimScript(tab);
+  }
+});
+
+async function ensureYTDimScript(tab) {
+  if (!tab || !tab.id || !isYouTubeUrl(tab.url)) return;
+  await chrome.scripting.executeScript({
+    target: { tabId: tab.id },
+    files: ["ytdim.js"],
+  }).catch(() => {});
+}
+
+function isYouTubeUrl(url) {
+  try {
+    const host = new URL(url).hostname;
+    return host === "youtube.com" || host.endsWith(".youtube.com");
+  } catch {
+    return false;
+  }
+}
 
 // ═══════════════════════════════════
 //  Cookie Consent (GDPR) Dismisser
