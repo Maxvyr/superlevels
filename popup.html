@@ -343,8 +343,7 @@
       position: relative;
     }
     .xdim-dot:hover { transform: scale(1.15); }
-    .xdim-dot.active,
-    .ytdim-dot.active { border-color: #fff; }
+    .xdim-dot.active { border-color: #fff; }
     .xdim-dot[data-theme="dim"]   { background: hsl(210, 34%, 13%); }
     .xdim-dot[data-theme="slate"] { background: hsl(210, 8%, 13%); }
     .xdim-dot[data-theme="jade"]  { background: hsl(150, 34%, 13%); }
@@ -352,22 +351,6 @@
     .xdim-dot[data-theme="dusk"]  { background: hsl(330, 34%, 13%); }
     .xdim-dot[data-theme="ember"] { background: hsl(25, 34%, 13%); }
     .xdim-dot[data-theme="custom"] {
-      background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red);
-    }
-    .ytdim-dot {
-      width: 28px; height: 28px; border-radius: 50%;
-      border: 2px solid transparent; cursor: pointer;
-      transition: border-color 0.2s, transform 0.15s;
-      position: relative;
-    }
-    .ytdim-dot:hover { transform: scale(1.15); }
-    .ytdim-dot[data-theme="dim"]   { background: hsl(210, 34%, 13%); }
-    .ytdim-dot[data-theme="slate"] { background: hsl(210, 8%, 13%); }
-    .ytdim-dot[data-theme="jade"]  { background: hsl(150, 34%, 13%); }
-    .ytdim-dot[data-theme="plum"]  { background: hsl(270, 34%, 13%); }
-    .ytdim-dot[data-theme="dusk"]  { background: hsl(330, 34%, 13%); }
-    .ytdim-dot[data-theme="ember"] { background: hsl(25, 34%, 13%); }
-    .ytdim-dot[data-theme="custom"] {
       background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red);
     }
     .xdim-custom-hue {
@@ -585,7 +568,6 @@
     <button data-page="cookies">🍪 Cookies</button>
     <button data-page="redirects">🔀 Redirects</button>
     <button data-page="xdim">𝕏 Dim</button>
-    <button data-page="ytdim">YT Dim</button>
     <button data-page="xunhook">𝕏 Unhook</button>
     <button data-page="jstoggle">⚡ JS</button>
     <button data-page="nocookie">🚫 GDPR</button>
@@ -713,55 +695,6 @@
 
       <div class="xdim-note">
         Applies a custom dim theme to X / Twitter.<br>
-        Choose a theme or set a custom hue for less eye strain.
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══ YouTube Dim Mode Page ═══ -->
-  <div class="page" id="page-ytdim">
-    <div class="page-body">
-      <div class="xdim-big-toggle">
-        <div class="xlogo" style="color:#e94560;">YT</div>
-        <label class="big-switch">
-          <input type="checkbox" id="ytdimToggle">
-          <span class="big-slider"></span>
-        </label>
-        <div class="status off" id="ytdimStatus">OFF</div>
-      </div>
-
-      <div class="xdim-themes">
-        <label>Theme</label>
-        <div class="xdim-theme-dots">
-          <div class="ytdim-dot active" data-theme="dim" title="Dim"></div>
-          <div class="ytdim-dot" data-theme="slate" title="Slate"></div>
-          <div class="ytdim-dot" data-theme="jade" title="Jade"></div>
-          <div class="ytdim-dot" data-theme="plum" title="Plum"></div>
-          <div class="ytdim-dot" data-theme="dusk" title="Dusk"></div>
-          <div class="ytdim-dot" data-theme="ember" title="Ember"></div>
-          <div class="ytdim-dot" data-theme="custom" title="Custom"></div>
-        </div>
-      </div>
-
-      <div class="xdim-custom-hue" id="ytdimCustomHueSection">
-        <label>Custom Hue</label>
-        <div class="range-row">
-          <input type="range" id="ytdimHueSlider" min="0" max="360" value="210">
-          <span class="range-val" id="ytdimHueVal">210°</span>
-        </div>
-      </div>
-
-      <div class="xdim-preview" id="ytdimPreview">
-        <div class="xdim-preview-bar">
-          <span class="dot"></span> Preview
-        </div>
-        <div class="xdim-preview-tweet">
-          YouTube surfaces use a softer dim palette for less glare during long watch sessions.
-        </div>
-      </div>
-
-      <div class="xdim-note">
-        Applies a custom dim theme to YouTube.<br>
         Choose a theme or set a custom hue for less eye strain.
       </div>
     </div>

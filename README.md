@@ -51,9 +51,6 @@ Write custom CSS for any website, applied in real-time as you type. Saved per-do
 ### 📺 YouTube Unhook
 Removes YouTube distractions: no homepage feed, no sidebar suggestions, no end screen overlays, no Shorts. Search still works — just no algorithmic recommendations.
 
-### YT Dim Mode
-Custom dim theme for YouTube with 7 color palettes: Dim, Slate, Jade, Plum, Dusk, Ember, or a custom hue. Live preview in the popup.
-
 ### 🖼 Picture-in-Picture
 Pop the largest video on the current tab into a floating PiP window with one click.
 
